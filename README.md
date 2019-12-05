@@ -1,6 +1,7 @@
 # KrakenD on OpenShift
 
 This repo contains Kubernetes/OpenShift manifests required for deploying the KrakenD API Gateway.
+There are also instructions below on how to integrate JWT Validation with Keycloak/Red Hat SSO.
 
 ## Requirements
 
@@ -55,3 +56,57 @@ At this point you should only have to wait momentarily to have the KrakenD API G
 ## Notes on using KrakenD with OpenShift/Kubernetes
 
 - If you are using some sort of Ingress you may need to set CORS for your reverse proxy
+
+### JWT Validation with Keycloak/Red Hat Single Sign On (SSO)
+
+#### Preliminary Keycloak/RH SSO Setup
+
+1. Deploy Keycloak, create admin user
+2. Create Realm
+3. Create Client for KrakenD
+4. Create Mapper for Client
+  - Name: userRealmRoles
+  - Mapper Type: User Realm Role
+  - Multivalued: On
+  - Token Claim Name: userRealmRoles
+  - Add to ID token: On
+  - Add to access token: On
+  - Add to userinfo: On
+5. Create ***user_basic*** Realm Role
+6. Create ***Admin*** & ***Users*** Groups
+7. Create test User
+8. Assign Groups the ***user_basic*** Realm Role
+9. Assign the test User to the Groups
+
+
+You may be using this to proxy API requests in order to wrap them with JWT for authentication.  Maybe you're even using Keycloak...
+
+1. Obtain your JWKS/OpenID Connect Configuration URL
+
+When configuring JWT Validation in a KrakenD Endpoint, you'll need the URL with the configuration information for your Realm in Keycloak.
+
+Assuming your Realm is named **example**...
+
+```https://sso-keycloak.domain.here.com/auth/realms/example/.well-known/openid-configuration```
+
+2. Extract the **jwks_uri**
+
+Now with that OpenID Connect Configuration information, you need to find a key in that JSON called ***jwks_uri*** - this is the URL you pass to KrakenD for the JWK URL.
+Should look something like...
+
+```https://sso-keycloak.domain.here.com/auth/realms/example/protocol/openid-connect/certs```
+
+
+3. Extract the **issuer**
+
+This one is pretty easy, it's the first key in that OpenID Connect config JSON called ***issuer***.
+Should look something like...
+
+```https://sso-keycloak.domain.here.com/auth/realms/example```
+
+4. Set Configuration in KrakenD to connect to Keycloak
+
+Set the extracted jwks_url as your JWK URI and issuer for Issuer.
+
+Odds are if you're using Keycloak you're using the RS256 algo.  Change the Algorithm to reflect this.
+Set your ***Roles*** to *user_basic* and the ***Roles Key*** to *userRealmRoles*
