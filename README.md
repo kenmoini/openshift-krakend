@@ -35,10 +35,13 @@ $ oc create configmap krakend-config --from-file=krakend.json
 
 ### 4. Deploy the Template
 
-Now that you have the ConfigMap available in the namespace/project, you can deploy the Template that will instanciate the resources...
+Now that you have the ConfigMap available in the namespace/project, you can deploy one of the Templates that will instanciate the resources...
 
 ```bash
+# Persistent Volume
 $ oc apply -f krakend-persistent-configmap-template.yaml
+# Ephemeral Storage
+$ oc apply -f krakend-configmap-template.yaml
 ```
 
 ### 5. Secure the API Gateway
