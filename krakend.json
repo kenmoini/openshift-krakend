@@ -2,27 +2,27 @@
     "version": 2,
     "port": 8080,
     "extra_config": {
-      "github_com/devopsfaith/krakend-cors": {
-        "allow_origins": [
-          "*"
-        ],
-        "expose_headers": [
-          "Content-Length"
-        ],
-        "max_age": "12h",
-        "allow_methods": [
-          "GET",
-          "HEAD",
-          "POST"
-        ]
-      },
-      "github_com/devopsfaith/krakend-gologging": {
-        "level": "INFO",
-        "prefix": "[KRAKEND]",
-        "syslog": false,
-        "stdout": true,
-        "format": "default"
-      }
+        "github_com/devopsfaith/krakend-cors": {
+            "allow_origins": [
+                "*"
+            ],
+            "expose_headers": [
+                "Content-Length"
+            ],
+            "max_age": "12h",
+            "allow_methods": [
+                "GET",
+                "HEAD",
+                "POST"
+            ]
+        },
+        "github_com/devopsfaith/krakend-gologging": {
+            "level": "INFO",
+            "prefix": "[KRAKEND]",
+            "syslog": false,
+            "stdout": true,
+            "format": "default"
+        }
     },
     "timeout": "3000ms",
     "cache_ttl": "300s",
@@ -32,22 +32,22 @@
         {
             "endpoint": "/healthz",
             "extra_config": {
-            "github.com/devopsfaith/krakend/proxy": {
-                "static": {
-                "data": {
-                    "status": "OK"
-                },
-                "strategy": "always"
+                "github.com/devopsfaith/krakend/proxy": {
+                    "static": {
+                        "data": {
+                            "status": "OK"
+                        },
+                        "strategy": "always"
+                    }
                 }
-            }
             },
             "backend": [
-            {
-                "url_pattern": "/",
-                "host": [
-                    "http://fake-backend"
-                ]
-            }
+                {
+                    "url_pattern": "/",
+                    "host": [
+                        "http://fake-backend"
+                    ]
+                }
             ]
         }
     ]

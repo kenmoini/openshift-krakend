@@ -42,8 +42,16 @@ Now that you have the ConfigMap available in the namespace/project, you can depl
 $ oc apply -f krakend-persistent-configmap-template.yaml
 # Ephemeral Storage
 $ oc apply -f krakend-configmap-template.yaml
+# Persistent Volume, Edge terminated SSL
+$ oc apply -f krakend-persistent-configmap-secure-template.yaml
+# Ephemeral Storage, Edge terminated SSL
+$ oc apply -f krakend-configmap-secure-template.yaml
 ```
 
 ### 5. Secure the API Gateway
 
-At this point you should only have to wait momentarily to have the KrakenD API Gateway come up.  Once it does, I highly suggest securing the Route with SSL.
+At this point you should only have to wait momentarily to have the KrakenD API Gateway come up.  Once it does, I highly suggest securing the Route with SSL if you did not do so with one of the ```-secure``` templates.
+
+## Notes on using KrakenD with OpenShift/Kubernetes
+
+- If you are using some sort of Ingress you may need to set CORS for your reverse proxy
