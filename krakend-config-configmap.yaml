@@ -1,39 +1,55 @@
 apiVersion: v1
 data:
-  krakend.json: "{\n    \"version\": 2,\n    \"port\": 8080,\n    \"extra_config\":
-    {\n        \"github_com/devopsfaith/krakend-cors\": {\n            \"allow_origins\":
-    [\n                \"*\"\n            ],\n            \"expose_headers\": [\n
-    \               \"Content-Length\"\n            ],\n            \"max_age\": \"12h\",\n
-    \           \"allow_methods\": [\n                \"GET\",\n                \"HEAD\",\n
-    \               \"POST\"\n            ]\n        },\n        \"github_com/devopsfaith/krakend-gologging\":
-    {\n            \"level\": \"INFO\",\n            \"prefix\": \"[KRAKEND]\",\n
-    \           \"syslog\": false,\n            \"stdout\": true,\n            \"format\":
-    \"default\"\n        }\n    },\n    \"timeout\": \"3000ms\",\n    \"cache_ttl\":
-    \"300s\",\n    \"output_encoding\": \"json\",\n    \"name\": \"Test KrakenD Service\",\n
-    \   \"endpoints\": [\n        {\n            \"endpoint\": \"/healthz\",\n            \"extra_config\":
-    {\n                \"github.com/devopsfaith/krakend/proxy\": {\n                    \"static\":
-    {\n                        \"data\": {\n                            \"status\":
-    \"OK\"\n                        },\n                        \"strategy\": \"always\"\n
-    \                   }\n                }\n            },\n            \"backend\":
-    [\n                {\n                    \"url_pattern\": \"/\",\n                    \"host\":
-    [\n                        \"http://fake-backend\"\n                    ]\n                }\n
-    \           ]\n        },\n        {\n          \"endpoint\": \"/testjwt\",\n
-    \         \"method\": \"GET\",\n          \"extra_config\": {\n            \"github.com/devopsfaith/krakend-jose/validator\":
-    {\n              \"alg\": \"RS256\",\n              \"jwk-url\": \"https://keycloak-host.com/auth/realms/yourRealm/protocol/openid-connect/certs\"
-    ,\n              \"issuer\": \"https://keycloak-host.com/auth/realms/yourRealm\"
-    ,\n              \"roles\": [\"user_basic\"],\n              \"roles_key\": \"userRealmRoles\"\n
-    \           },\n            \"github.com/devopsfaith/krakend/proxy\": {\n              \"static\":
-    {\n                \"data\": {\n                  \"new_field_a\": 123,\n                  \"new_field_b\":
-    [\n                    \"arr1\",\n                    \"arr2\"\n                  ],\n
-    \                 \"new_field_c\": {\n                    \"obj\": \"obj1\"\n
-    \                 }\n                },\n                \"strategy\": \"always\"\n
-    \             }\n            }\n          },\n          \"output_encoding\": \"json\",\n
-    \         \"concurrent_calls\": 1,\n          \"backend\": [\n            {\n
+  krakend.json: "{\n  \"version\": 2,\n  \"port\": 8080,\n  \"extra_config\": {\n
+    \     \"github_com/devopsfaith/krakend-cors\": {\n          \"allow_origins\":
+    [\n              \"http*\"\n          ],\n          \"allow_headers\": [\"Origin\",
+    \"Authorization\", \"Content-Length\", \"Content-Type\", \"Accept\", \"X-Auth-Token\"],\n
+    \         \"expose_headers\": [\"Content-Type\", \"Content-Length\"],\n          \"max_age\":
+    \"12h\",\n          \"allow_credentials\": false,\n          \"allow_methods\":
+    [\n              \"GET\",\n              \"HEAD\",\n              \"POST\",\n
+    \             \"PUT\",\n              \"DELETE\",\n              \"CONNECT\",\n
+    \             \"OPTIONS\",\n              \"TRACE\",\n              \"PATCH\"\n
+    \         ]\n      },\n      \"github_com/devopsfaith/krakend-gologging\": {\n
+    \         \"level\": \"DEBUG\",\n          \"prefix\": \"[KRAKEND]\",\n          \"syslog\":
+    false,\n          \"stdout\": true,\n          \"format\": \"default\"\n      }\n
+    \ },\n  \"timeout\": \"3000ms\",\n  \"cache_ttl\": \"300s\",\n  \"output_encoding\":
+    \"json\",\n  \"name\": \"KrakenD API Gateway Service\",\n  \"endpoints\": [\n
+    \     {\n          \"endpoint\": \"/healthz\",\n          \"extra_config\": {\n
+    \             \"github.com/devopsfaith/krakend/proxy\": {\n                  \"static\":
+    {\n                      \"data\": {\n                          \"status\": \"OK\"\n
+    \                     },\n                      \"strategy\": \"always\"\n                  }\n
+    \             }\n          },\n          \"backend\": [\n              {\n                  \"url_pattern\":
+    \"/\",\n                  \"host\": [\n                      \"http://fake-backend\"\n
+    \                 ]\n              }\n          ]\n      },\n      {\n          \"endpoint\":
+    \"/testjwt\",\n          \"method\": \"GET\",\n          \"extra_config\": {\n
+    \             \"github.com/devopsfaith/krakend-jose/validator\": {\n              \"alg\":
+    \"RS256\",\n              \"jwk-url\": \"https://keycloak.server.tld/auth/realms/yourRealm/protocol/openid-connect/certs\",\n
+    \             \"issuer\": \"https://keycloak.server.tld/auth/realms/yourRealm\",\n
+    \             \"roles\": [],\n              \"roles_key\": \"userRealmRoles\"\n
+    \             },\n              \"github.com/devopsfaith/krakend/proxy\": {\n
+    \             \"static\": {\n                  \"data\": {\n                      \"jwt\":
+    \"valid\"\n                  },\n                  \"strategy\": \"always\"\n
+    \             }\n              }\n          },\n          \"output_encoding\":
+    \"json\",\n          \"concurrent_calls\": 1,\n          \"backend\": [\n              {\n
     \             \"url_pattern\": \"/\",\n              \"encoding\": \"json\",\n
     \             \"sd\": \"static\",\n              \"extra_config\": {},\n              \"method\":
-    \"GET\",\n              \"host\": [\n                \"http://fake-backend\" \n
-    \             ],\n              \"disable_host_sanitize\": true\n            }\n
-    \         ]\n        }\n    ]\n}\n"
+    \"GET\",\n              \"host\": [\n                  \"http://fake-backend\"
+    \n              ],\n              \"disable_host_sanitize\": true\n              }\n
+    \         ]\n      },\n      {\n          \"endpoint\": \"/uploadDMARCBundle\",\n
+    \         \"method\": \"POST\",\n          \"extra_config\": {\n              \"github.com/devopsfaith/krakend-jose/validator\":
+    {\n                  \"alg\": \"RS256\",\n                  \"jwk-url\": \"https://keycloak.server.tld/auth/realms/yourRealm/protocol/openid-connect/certs\",\n
+    \                 \"issuer\": \"https://keycloak.server.tld/auth/realms/yourRealm\",\n
+    \                 \"roles_key\": \"userRealmRoles\"\n              }\n          },\n
+    \         \"output_encoding\": \"no-op\",\n          \"concurrent_calls\": 1,\n
+    \         \"backend\": [\n              {\n                  \"url_pattern\":
+    \"/api/v1/upload_bundle\",\n                  \"encoding\": \"no-op\",\n                  \"sd\":
+    \"static\",\n                  \"extra_config\": {},\n                  \"host\":
+    [\n                      \"http://dmarc-rest-api:8080\"\n                  ],\n
+    \                 \"disable_host_sanitize\": true\n              }\n          ],\n
+    \         \"headers_to_pass\": [\n              \"Accept\",\n              \"Accept-Encoding\",\n
+    \             \"Content-Encoding\",\n              \"Content-Length\",\n              \"Content-Type\",\n
+    \             \"Sec-Fetch-Mode\",\n              \"Sec-Fetch-Site\"\n          ]\n
+    \     }\n  ]\n}"
 kind: ConfigMap
 metadata:
   creationTimestamp: null

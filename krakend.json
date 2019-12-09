@@ -1,97 +1,131 @@
 {
-    "version": 2,
-    "port": 8080,
-    "extra_config": {
-        "github_com/devopsfaith/krakend-cors": {
-            "allow_origins": [
-                "*"
-            ],
-            "expose_headers": [
-                "Content-Length"
-            ],
-            "max_age": "12h",
-            "allow_methods": [
-                "GET",
-                "HEAD",
-                "POST"
-            ]
-        },
-        "github_com/devopsfaith/krakend-gologging": {
-            "level": "INFO",
-            "prefix": "[KRAKEND]",
-            "syslog": false,
-            "stdout": true,
-            "format": "default"
-        }
-    },
-    "timeout": "3000ms",
-    "cache_ttl": "300s",
-    "output_encoding": "json",
-    "name": "Test KrakenD Service",
-    "endpoints": [
-        {
-            "endpoint": "/healthz",
-            "extra_config": {
-                "github.com/devopsfaith/krakend/proxy": {
-                    "static": {
-                        "data": {
-                            "status": "OK"
-                        },
-                        "strategy": "always"
-                    }
-                }
-            },
-            "backend": [
-                {
-                    "url_pattern": "/",
-                    "host": [
-                        "http://fake-backend"
-                    ]
-                }
-            ]
-        },
-        {
+  "version": 2,
+  "port": 8080,
+  "extra_config": {
+      "github_com/devopsfaith/krakend-cors": {
+          "allow_origins": [
+              "http*"
+          ],
+          "allow_headers": ["Origin", "Authorization", "Content-Length", "Content-Type", "Accept", "X-Auth-Token"],
+          "expose_headers": ["Content-Type", "Content-Length"],
+          "max_age": "12h",
+          "allow_credentials": false,
+          "allow_methods": [
+              "GET",
+              "HEAD",
+              "POST",
+              "PUT",
+              "DELETE",
+              "CONNECT",
+              "OPTIONS",
+              "TRACE",
+              "PATCH"
+          ]
+      },
+      "github_com/devopsfaith/krakend-gologging": {
+          "level": "DEBUG",
+          "prefix": "[KRAKEND]",
+          "syslog": false,
+          "stdout": true,
+          "format": "default"
+      }
+  },
+  "timeout": "3000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "json",
+  "name": "KrakenD API Gateway Service",
+  "endpoints": [
+      {
+          "endpoint": "/healthz",
+          "extra_config": {
+              "github.com/devopsfaith/krakend/proxy": {
+                  "static": {
+                      "data": {
+                          "status": "OK"
+                      },
+                      "strategy": "always"
+                  }
+              }
+          },
+          "backend": [
+              {
+                  "url_pattern": "/",
+                  "host": [
+                      "http://fake-backend"
+                  ]
+              }
+          ]
+      },
+      {
           "endpoint": "/testjwt",
           "method": "GET",
           "extra_config": {
-            "github.com/devopsfaith/krakend-jose/validator": {
+              "github.com/devopsfaith/krakend-jose/validator": {
               "alg": "RS256",
-              "jwk-url": "https://keycloak-host.com/auth/realms/yourRealm/protocol/openid-connect/certs" ,
-              "issuer": "https://keycloak-host.com/auth/realms/yourRealm" ,
-              "roles": ["user_basic"],
+              "jwk-url": "https://keycloak.server.tld/auth/realms/yourRealm/protocol/openid-connect/certs",
+              "issuer": "https://keycloak.server.tld/auth/realms/yourRealm",
+              "roles": [],
               "roles_key": "userRealmRoles"
-            },
-            "github.com/devopsfaith/krakend/proxy": {
+              },
+              "github.com/devopsfaith/krakend/proxy": {
               "static": {
-                "data": {
-                  "new_field_a": 123,
-                  "new_field_b": [
-                    "arr1",
-                    "arr2"
-                  ],
-                  "new_field_c": {
-                    "obj": "obj1"
-                  }
-                },
-                "strategy": "always"
+                  "data": {
+                      "jwt": "valid"
+                  },
+                  "strategy": "always"
               }
-            }
+              }
           },
           "output_encoding": "json",
           "concurrent_calls": 1,
           "backend": [
-            {
+              {
               "url_pattern": "/",
               "encoding": "json",
               "sd": "static",
               "extra_config": {},
               "method": "GET",
               "host": [
-                "http://fake-backend" 
+                  "http://fake-backend" 
               ],
               "disable_host_sanitize": true
-            }
+              }
           ]
-        }
-    ]
+      },
+      {
+          "endpoint": "/uploadDMARCBundle",
+          "method": "POST",
+          "extra_config": {
+              "github.com/devopsfaith/krakend-jose/validator": {
+                  "alg": "RS256",
+                  "jwk-url": "https://keycloak.server.tld/auth/realms/yourRealm/protocol/openid-connect/certs",
+                  "issuer": "https://keycloak.server.tld/auth/realms/yourRealm",
+                  "roles_key": "userRealmRoles"
+              }
+          },
+          "output_encoding": "no-op",
+          "concurrent_calls": 1,
+          "backend": [
+              {
+                  "url_pattern": "/api/v1/upload_bundle",
+                  "encoding": "no-op",
+                  "sd": "static",
+                  "extra_config": {},
+                  "host": [
+                      "http://dmarc-rest-api:8080"
+                  ],
+                  "disable_host_sanitize": true
+              }
+          ],
+          "headers_to_pass": [
+              "Accept",
+              "Accept-Encoding",
+              "Content-Encoding",
+              "Content-Length",
+              "Content-Type",
+              "Sec-Fetch-Mode",
+              "Sec-Fetch-Site"
+          ]
+      }
+  ]
 }
