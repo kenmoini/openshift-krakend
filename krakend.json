@@ -49,6 +49,49 @@
                     ]
                 }
             ]
+        },
+        {
+          "endpoint": "/testjwt",
+          "method": "GET",
+          "extra_config": {
+            "github.com/devopsfaith/krakend-jose/validator": {
+              "alg": "RS256",
+              "jwk-url": "https://keycloak-host.com/auth/realms/yourRealm/protocol/openid-connect/certs" ,
+              "issuer": "https://keycloak-host.com/auth/realms/yourRealm" ,
+              "roles": ["user_basic"],
+              "roles_key": "userRealmRoles"
+            },
+            "github.com/devopsfaith/krakend/proxy": {
+              "static": {
+                "data": {
+                  "new_field_a": 123,
+                  "new_field_b": [
+                    "arr1",
+                    "arr2"
+                  ],
+                  "new_field_c": {
+                    "obj": "obj1"
+                  }
+                },
+                "strategy": "always"
+              }
+            }
+          },
+          "output_encoding": "json",
+          "concurrent_calls": 1,
+          "backend": [
+            {
+              "url_pattern": "/",
+              "encoding": "json",
+              "sd": "static",
+              "extra_config": {},
+              "method": "GET",
+              "host": [
+                "http://fake-backend" 
+              ],
+              "disable_host_sanitize": true
+            }
+          ]
         }
     ]
 }
