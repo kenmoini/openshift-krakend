@@ -1,0 +1,40 @@
+apiVersion: v1
+data:
+  krakend.json: "{\n    \"version\": 2,\n    \"port\": 8080,\n    \"extra_config\":
+    {\n        \"github_com/devopsfaith/krakend-cors\": {\n            \"allow_origins\":
+    [\n                \"*\"\n            ],\n            \"expose_headers\": [\n
+    \               \"Content-Length\"\n            ],\n            \"max_age\": \"12h\",\n
+    \           \"allow_methods\": [\n                \"GET\",\n                \"HEAD\",\n
+    \               \"POST\"\n            ]\n        },\n        \"github_com/devopsfaith/krakend-gologging\":
+    {\n            \"level\": \"INFO\",\n            \"prefix\": \"[KRAKEND]\",\n
+    \           \"syslog\": false,\n            \"stdout\": true,\n            \"format\":
+    \"default\"\n        }\n    },\n    \"timeout\": \"3000ms\",\n    \"cache_ttl\":
+    \"300s\",\n    \"output_encoding\": \"json\",\n    \"name\": \"Test KrakenD Service\",\n
+    \   \"endpoints\": [\n        {\n            \"endpoint\": \"/healthz\",\n            \"extra_config\":
+    {\n                \"github.com/devopsfaith/krakend/proxy\": {\n                    \"static\":
+    {\n                        \"data\": {\n                            \"status\":
+    \"OK\"\n                        },\n                        \"strategy\": \"always\"\n
+    \                   }\n                }\n            },\n            \"backend\":
+    [\n                {\n                    \"url_pattern\": \"/\",\n                    \"host\":
+    [\n                        \"http://fake-backend\"\n                    ]\n                }\n
+    \           ]\n        },\n        {\n          \"endpoint\": \"/testjwt\",\n
+    \         \"method\": \"GET\",\n          \"extra_config\": {\n            \"github.com/devopsfaith/krakend-jose/validator\":
+    {\n              \"alg\": \"RS256\",\n              \"jwk-url\": \"https://keycloak-host.com/auth/realms/yourRealm/protocol/openid-connect/certs\"
+    ,\n              \"issuer\": \"https://keycloak-host.com/auth/realms/yourRealm\"
+    ,\n              \"roles\": [\"user_basic\"],\n              \"roles_key\": \"userRealmRoles\"\n
+    \           },\n            \"github.com/devopsfaith/krakend/proxy\": {\n              \"static\":
+    {\n                \"data\": {\n                  \"new_field_a\": 123,\n                  \"new_field_b\":
+    [\n                    \"arr1\",\n                    \"arr2\"\n                  ],\n
+    \                 \"new_field_c\": {\n                    \"obj\": \"obj1\"\n
+    \                 }\n                },\n                \"strategy\": \"always\"\n
+    \             }\n            }\n          },\n          \"output_encoding\": \"json\",\n
+    \         \"concurrent_calls\": 1,\n          \"backend\": [\n            {\n
+    \             \"url_pattern\": \"/\",\n              \"encoding\": \"json\",\n
+    \             \"sd\": \"static\",\n              \"extra_config\": {},\n              \"method\":
+    \"GET\",\n              \"host\": [\n                \"http://fake-backend\" \n
+    \             ],\n              \"disable_host_sanitize\": true\n            }\n
+    \         ]\n        }\n    ]\n}\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: krakend-config
